@@ -1,25 +1,19 @@
-name: Environment Diagnostic and Install
+name: Ultimate Probe
 
 on:
   workflow_dispatch:
 
 jobs:
-  diagnostic-job:
+  probe-job:
     runs-on: ubuntu-latest
     steps:
-      - name: 1. 强制安装 FFmpeg
+      - name: 探测网络与文件
         run: |
-          echo "--- 正在尝试安装 FFmpeg ---"
-          sudo apt-get update -qq
-          sudo apt-get install -y ffmpeg
+          echo "--- 1. 检查网络连通性 ---"
+          curl -I https://github.com/nilaoda/N_m3u8DL-RE/releases/download/v0.3.0-beta/N_m3u8DL-RE_linux-x64.tar.gz
           
-          echo "--- 安装后环境确认 ---"
-          # 验证安装是否成功，将版本号输出到日志
-          ffmpeg -version || echo "FFmpeg 安装依然失败"
-
-      - name: 2. 验证 N_m3u8DL-RE 引擎结构
-        run: |
-          echo "--- 下载并探测压缩包结构 ---"
-          wget -q https://github.com/nilaoda/N_m3u8DL-RE/releases/download/v0.3.0-beta/N_m3u8DL-RE_linux-x64.tar.gz
-          # 明确打印压缩包内的真实目录树
-          tar -tf N_m3u8DL-RE_linux-x64.tar.gz
+          echo "--- 2. 下载并显示前 100 字节内容 (检查是否为404报错) ---"
+          curl -L https://github.com/nilaoda/N_m3u8DL-RE/releases/download/v0.3.0-beta/N_m3u8DL-RE_linux-x64.tar.gz | head -c 100
+          
+          echo -e "\n--- 3. 检查系统是否存在 ffmpeg ---"
+          command -v ffmpeg || echo "FFmpeg 未找到"
