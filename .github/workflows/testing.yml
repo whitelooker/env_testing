@@ -1,25 +1,32 @@
-name: Find Truth
+name: Debugger - Full Environment Audit
 
 on:
   workflow_dispatch:
 
 jobs:
-  find-truth:
+  audit-job:
     runs-on: ubuntu-latest
     steps:
-      - name: 探测真实下载路径
+      - name: 1. 深度扫描 Release 资源
         run: |
-          echo "--- 正在请求 GitHub API 获取该项目最新的 Release 信息 ---"
-          # 使用 API 获取最新版本的信息
-          RESPONSE=$(curl -s https://api.github.com/repos/nilaoda/N_m3u8DL-RE/releases/latest)
+          echo "--- 开始深度扫描：N_m3u8DL-RE ---"
+          # 直接获取 JSON 结构，这是最原始的数据
+          DATA=$(curl -s https://api.github.com/repos/nilaoda/N_m3u8DL-RE/releases/latest)
           
-          echo "--- 解析下载列表 ---"
-          # 提取所有包含 linux-x64 的下载链接
-          echo "$RESPONSE" | grep -o "https://github.com/[^\"]*linux-x64[^\"]*"
-          
-          echo "--- 结论 ---"
-          if [ -z "$(echo "$RESPONSE" | grep -o "https://github.com/[^\"]*linux-x64[^\"]*")" ]; then
-            echo "错误：未能在最新的 Release 中找到 linux-x64 相关文件。"
-          else
-            echo "已成功找到，请使用上方输出的链接进行下载。"
+          # 判断 API 是否请求成功
+          if [[ $? -ne 0 ]]; then
+            echo "故障：无法连接到 GitHub API"
+            exit 1
           fi
+
+          # 打印所有可用的下载地址及其名称
+          echo "--- 发现的下载清单 ---"
+          echo "$DATA" | grep -E "name|browser_download_url" | sed 's/^[ \t]*//'
+          
+      - name: 2. 检查系统运行环境
+        run: |
+          echo "--- 环境确认 ---"
+          # 检查当前的 CPU 架构，决定下载什么版本的二进制文件
+          uname -m
+          # 检查是否有可用的包管理工具
+          command -v apt-get || echo "apt-get 未找到"
