@@ -1,4 +1,4 @@
-name: Ultimate Probe
+name: Ultimate Structure Probe
 
 on:
   workflow_dispatch:
@@ -7,13 +7,16 @@ jobs:
   probe-job:
     runs-on: ubuntu-latest
     steps:
-      - name: 探测网络与文件
+      - name: 下载并查看真相
         run: |
-          echo "--- 1. 检查网络连通性 ---"
-          curl -I https://github.com/nilaoda/N_m3u8DL-RE/releases/download/v0.3.0-beta/N_m3u8DL-RE_linux-x64.tar.gz
+          # 1. 下载
+          wget -q https://github.com/nilaoda/N_m3u8DL-RE/releases/download/v0.3.0-beta/N_m3u8DL-RE_linux-x64.tar.gz
           
-          echo "--- 2. 下载并显示前 100 字节内容 (检查是否为404报错) ---"
-          curl -L https://github.com/nilaoda/N_m3u8DL-RE/releases/download/v0.3.0-beta/N_m3u8DL-RE_linux-x64.tar.gz | head -c 100
+          # 2. 打印压缩包内的所有文件列表 (这是最关键的一步)
+          echo "--- 压缩包内部结构 ---"
+          tar -tf N_m3u8DL-RE_linux-x64.tar.gz
           
-          echo -e "\n--- 3. 检查系统是否存在 ffmpeg ---"
-          command -v ffmpeg || echo "FFmpeg 未找到"
+          # 3. 解压并确认文件权限
+          tar -zxvf N_m3u8DL-RE_linux-x64.tar.gz
+          echo "--- 文件权限状态 ---"
+          ls -l N_m3u8DL-RE
