@@ -22,41 +22,4 @@ jobs:
           echo "--- 下载并探测压缩包结构 ---"
           wget -q https://github.com/nilaoda/N_m3u8DL-RE/releases/download/v0.3.0-beta/N_m3u8DL-RE_linux-x64.tar.gz
           # 明确打印压缩包内的真实目录树
-          tar -tf N_m3u8DL-RE_linux-x64.tar.gzname: Environment Diagnostic Tool
-
-on:
-  workflow_dispatch:
-
-jobs:
-  diagnostic-job:
-    runs-on: ubuntu-latest
-    steps:
-      - name: 1. 系统基础环境探测
-        run: |
-          echo "--- 操作系统信息 ---"
-          uname -a
-          echo "--- 磁盘空间 ---"
-          df -h
-          echo "--- 环境变量检查 ---"
-          env | grep PATH
-
-      - name: 2. 核心组件验证 (FFmpeg)
-        run: |
-          echo "--- 验证 FFmpeg 安装状态 ---"
-          which ffmpeg
-          ffmpeg -version 2>&1 | head -n 1
-          
-      - name: 3. 模拟下载与路径测试
-        run: |
-          echo "--- 执行探测性下载任务 ---"
-          # 仅下载不解压，观察环境响应
-          wget -q https://github.com/nilaoda/N_m3u8DL-RE/releases/download/v0.3.0-beta/N_m3u8DL-RE_linux-x64.tar.gz
-          ls -lh N_m3u8DL-RE_linux-x64.tar.gz
-          
-          echo "--- 解压后的内容清单 ---"
-          tar -ztvf N_m3u8DL-RE_linux-x64.tar.gz
-          
-          echo "--- 确认二进制文件位置 ---"
-          tar -zxvf N_m3u8DL-RE_linux-x64.tar.gz
-          # 动态搜索并打印确切路径
-          find . -name "N_m3u8DL-RE" -type f -exec realpath {} \;
+          tar -tf N_m3u8DL-RE_linux-x64.tar.gz
