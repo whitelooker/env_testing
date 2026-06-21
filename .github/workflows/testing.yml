@@ -1,4 +1,53 @@
-name: Ultimate Structure Probe
+name: Strict Verification Flow
+
+on:
+  workflow_dispatch:
+
+jobs:
+  verification-job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 严谨的下载与验证流程
+        run: |
+          URL="https://github.com/nilaoda/N_m3u8DL-RE/releases/download/v0.3.0-beta/N_m3u8DL-RE_linux-x64.tar.gz"
+          FILENAME="downloaded_file"
+          
+          echo "--- 开始严谨验证 ---"
+          
+          # 1. 下载并记录返回状态
+          if curl -L -f -o "$FILENAME" "$URL"; then
+            echo "下载成功。"
+          else
+            echo "下载失败：服务器返回错误或网络不可达。"
+            exit 1
+          fi
+
+          # 2. 检查文件大小
+          FILESIZE=$(stat -c%s "$FILENAME")
+          echo "文件大小: $FILESIZE 字节"
+          if [ "$FILESIZE" -lt 1000 ]; then
+            echo "警告：文件太小，可能只是一个 404 错误页面。"
+            cat "$FILENAME"
+            exit 1
+          fi
+
+          # 3. 明确文件类型
+          echo "文件类型诊断:"
+          file "$FILENAME"
+          
+          # 4. If-Else 逻辑判断真实身份
+          if file "$FILENAME" | grep -q "gzip compressed"; then
+            echo "结论：这是一个标准的 tar.gz 压缩包。"
+            tar -ztvf "$FILENAME" || echo "错误：无法读取压缩包内容。"
+          elif file "$FILENAME" | grep -q "ELF"; then
+            echo "结论：这是一个直接可运行的二进制程序 (ELF)。"
+            chmod +x "$FILENAME"
+            ./"$FILENAME" --version || echo "尝试运行该程序失败。"
+          else
+            echo "结论：无法识别的文件格式。前 50 字节内容如下："
+            head -c 50 "$FILENAME"
+            exit 1
+          finame: Ultimate Structure Probe
 
 on:
   workflow_dispatch:
