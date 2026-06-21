@@ -1,4 +1,28 @@
-name: Environment Diagnostic Tool
+name: Environment Diagnostic and Install
+
+on:
+  workflow_dispatch:
+
+jobs:
+  diagnostic-job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 1. 强制安装 FFmpeg
+        run: |
+          echo "--- 正在尝试安装 FFmpeg ---"
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg
+          
+          echo "--- 安装后环境确认 ---"
+          # 验证安装是否成功，将版本号输出到日志
+          ffmpeg -version || echo "FFmpeg 安装依然失败"
+
+      - name: 2. 验证 N_m3u8DL-RE 引擎结构
+        run: |
+          echo "--- 下载并探测压缩包结构 ---"
+          wget -q https://github.com/nilaoda/N_m3u8DL-RE/releases/download/v0.3.0-beta/N_m3u8DL-RE_linux-x64.tar.gz
+          # 明确打印压缩包内的真实目录树
+          tar -tf N_m3u8DL-RE_linux-x64.tar.gzname: Environment Diagnostic Tool
 
 on:
   workflow_dispatch:
